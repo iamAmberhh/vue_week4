@@ -2,7 +2,8 @@ let productModal = null;
 let deleteModal = null;
 
 import pagePagination from './components/pagination.js';
-import productModule from './components/productModule.js';
+import productComponent from './components/productComponent.js';
+import deleteComponent from './components/deleteComponent.js';
 
 const app = Vue.createApp({
   data() {
@@ -11,6 +12,7 @@ const app = Vue.createApp({
       pages:{},
       isNew: false,
       addImg: false,
+      uploadImg:false,
       newImg: "",
       selectProduct: {
         data: {
@@ -30,7 +32,8 @@ const app = Vue.createApp({
   },
   components:{
     pagePagination,
-    productModule,
+    productComponent,
+    deleteComponent,
   },
   methods: {
     checkAdmin() {
@@ -112,9 +115,15 @@ const app = Vue.createApp({
     addImgBtn(){
       this.addImg = true;
     },
-    addNewImg() {
+    inputImgUrl(img){
+      this.newImg = img;
+    },
+    addNewImg(img) {
       if(!this.selectProduct.data.hasOwnProperty('imagesUrl')){
         this.selectProduct.data.imagesUrl = [];
+      }
+      if(this.newImg.trim() === ""){
+        return;
       }
       this.selectProduct.data.imagesUrl.push(this.newImg);
       this.clearImg();

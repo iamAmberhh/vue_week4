@@ -1,10 +1,16 @@
 export default{
     props:['selectProduct','clearProduct','isNew','deleteImg','addImg','newImg','clearImg','addNewImg','updateProduct'],
-    emits:['addImg','addNewImg','newImg'],
+    emits:['addImg','addNewImg','newImg','inputImg'],
+    methods:{
+      inputImg(e){
+        let imgUrl = e.target.value;
+        this.$emit('inputImg',imgUrl);
+      }
+    },
     template:`
     <div class="modal-dialog modal-xl">
     <div class="modal-content border-0">
-      <div class="modal-header bg-dark text-white">
+      <div class="modal-header text-white" :class="{'bg-warning':isNew,'bg-info':!isNew}" >
         <h5 id="productModalLabel" class="modal-title">
           <span v-if="isNew">新增產品</span>
           <span v-else>修改產品</span>
@@ -33,13 +39,13 @@ export default{
               </div>
               <div v-if="addImg" class="mb-3">
                  <label for="image" class="form-label">圖片網址</label>
-      <input type="text" class="form-control" placeholder="請輸入圖片連結" @input="$emit('newImg',$event.target.value)" v-model="newImg">
+      <input type="text" class="form-control" placeholder="請輸入圖片連結" @input="inputImg">
                   <img class="img-fluid" v-if="newImg" :src="newImg" alt="img">
               </div>
-              <button class="btn btn-outline-primary btn-sm d-block w-100" @click.prevent="$emit('addImg')" v-if="!addImg">
+              <button class="btn btn-outline-primary btn-sm d-block w-100 mb-2" @click.prevent="$emit('addImg')" v-if="!addImg">
                 新增圖片
               </button>
-              <div v-if="addImg" class="d-flex">
+              <div v-if="addImg" class="d-flex mb-2">
                 <button class="btn btn-outline-secondary btn-sm d-block w-50 me-2" @click.prevent="clearImg">
                 取消
               </button>
@@ -47,7 +53,6 @@ export default{
                 確認
               </button>
               </div>
-               
             </div>
           </div>
           <div class="col-sm-8">
