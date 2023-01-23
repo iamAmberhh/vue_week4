@@ -1,10 +1,37 @@
 export default{
     props:['selectProduct','clearProduct','isNew','deleteImg','addImg','newImg','clearImg','addNewImg','updateProduct'],
     emits:['addImg','addNewImg','newImg','inputImg'],
+    data(){
+      return{
+        uploadImg:false,
+        uploadImgUrl:"",
+      }
+    },
     methods:{
       inputImg(e){
         let imgUrl = e.target.value;
         this.$emit('inputImg',imgUrl);
+      },
+      clearUploadImg(){
+        this.uploadImgUrl = "";
+        this.$refs.fileInput.value = '';
+      },
+      uploadNewImg(){
+        const file = this.$refs.fileInput.files[0];
+        const formData = new FormData();
+        formData.append('file-to-upload',file)
+        axios
+        .post(`${apiUrl}v2/api/${path}/admin/upload`,formData)
+        .then(res=>{
+          this.uploadImgUrl = res.data.imageUrl;
+        })
+       .catch(err=>{
+        alert(err.data.message)
+       })
+      },
+      pushUploadImg(){
+        this.selectProduct.data.imagesUrl.push(this.uploadImgUrl);
+        this.clearUploadImg();
       }
     },
     template:`
@@ -42,17 +69,32 @@ export default{
       <input type="text" class="form-control" placeholder="請輸入圖片連結" @input="inputImg">
                   <img class="img-fluid" v-if="newImg" :src="newImg" alt="img">
               </div>
-              <button class="btn btn-outline-primary btn-sm d-block w-100 mb-2" @click.prevent="$emit('addImg')" v-if="!addImg">
+              <button type="button" class="btn btn-outline-primary btn-sm d-block w-100 mb-2" @click="$emit('addImg')" v-if="!addImg">
                 新增圖片
               </button>
               <div v-if="addImg" class="d-flex mb-2">
-                <button class="btn btn-outline-secondary btn-sm d-block w-50 me-2" @click.prevent="clearImg">
+                <button type="button" class="btn btn-outline-secondary btn-sm d-block w-50 me-2" @click="clearImg">
                 取消
               </button>
-               <button class="btn btn-outline-primary btn-sm d-block w-50" @click.prevent="$emit('addNewImg')">
+               <button type="button" class="btn btn-outline-primary btn-sm d-block w-50" @click="$emit('addNewImg')">
                 確認
               </button>
               </div>
+              <div v-if="uploadImg" class="mb-3">
+              <label for="image" class="form-label">上傳圖片</label>
+   <input type="text" class="form-control" @input="inputImg">
+               <img class="img-fluid" v-if="newImg" :src="newImg" alt="img">
+           </div>
+           <img class="img-fluid" v-if="uploadImgUrl" :src="uploadImgUrl" alt="img">
+              <input type="file" class="form-control btn btn-outline-primary" id="file" placeholder="上傳圖片" v-if="!uploadImg" @change="uploadNewImg" ref="fileInput">
+              <div v-if="uploadImgUrl" class="d-flex mb-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm d-block w-50 me-2" @click="clearUploadImg">
+              取消
+            </button>
+             <button type="button" class="btn btn-outline-primary btn-sm d-block w-50" @click="pushUploadImg">
+              確認
+            </button>
+            </div>
             </div>
           </div>
           <div class="col-sm-8">
@@ -93,10 +135,7 @@ export default{
               <input id="address" type="text" class="form-control" placeholder="請輸入兌換地點" v-model="selectProduct.data.address">
             </div>
           </div>
-
-
             <hr>
-
             <div class="mb-3">
               <label for="description" class="form-label">產品描述</label>
               <textarea id="description" type="text" class="form-control" placeholder="請輸入產品描述" v-model="selectProduct.data.description">

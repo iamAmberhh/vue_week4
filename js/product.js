@@ -12,7 +12,6 @@ const app = Vue.createApp({
       pages:{},
       isNew: false,
       addImg: false,
-      uploadImg:false,
       newImg: "",
       selectProduct: {
         data: {
